@@ -1,0 +1,77 @@
+service: tipr-api
+custom:
+  secrets: ${file(secrets.json)}
+provider:
+  name: aws
+  runtime: nodejs10.x
+  timeout: 30
+  stage: ${self:custom.secrets.NODE_ENV}
+  profile: tiprDev
+  region: us-east-1
+  environment: 
+    NODE_ENV: ${self:custom.secrets.NODE_ENV}
+    DB_NAME: ${self:custom.secrets.DB_NAME}
+    DB_USER: ${self:custom.secrets.DB_USER}
+    DB_PASSWORD: ${self:custom.secrets.DB_PASSWORD}
+    DB_HOST: ${self:custom.secrets.DB_HOST}
+    DB_PORT: ${self:custom.secrets.DB_PORT}
+  vpc:
+    securityGroupIds:
+      - sg-a54ce8d8
+    subnetIds:
+      - subnet-e38416ef
+      - subnet-dc47de95
+      - subnet-1b994c27
+      - subnet-00309e2d
+      - subnet-c54eec9e
+      - subnet-ba4500df
+functions:
+  healthCheck:
+    handler: handler.healthCheck
+    events:
+      - http:
+          path: /
+          method: get
+          cors: true
+  signup:
+    handler: handler.signup
+    events:
+      - http:
+          path: signup
+          method: post
+          cors: true
+  create:
+    handler: handler.create
+    events:
+      - http:
+          path: user
+          method: post
+          cors: true
+  getOne:
+    handler: handler.getOne
+    events:
+      - http:
+          path: user/{id}
+          method: get
+          cors: true
+  getAll:
+    handler: handler.getAll
+    events:
+     - http:
+         path: user
+         method: get
+         cors: true
+  update:
+    handler: handler.update
+    events:
+     - http:
+         path: user/{id}
+         method: put
+         cors: true
+  destroy:
+    handler: handler.destroy
+    events:
+     - http:
+         path: user/{id}
+         method: delete
+         cors: true
